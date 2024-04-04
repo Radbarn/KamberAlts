@@ -1,5 +1,5 @@
 -- Set to current version
-local KAversion = "KamberAlts v1.0.0"
+local KAversion = "KamberAlts v1.1.0"
 local KAname = "KamberAlts"
 
 -- Set Currency IDs
@@ -24,6 +24,14 @@ local headerTooltips = {
     ["Server"] = "The server this character is on\nClick to Sort by this column",
 }
 
+--Define the KamberAltFrame so it can be referenced in various functions.  Frame settings are handled farther down
+---@class KamberAltFrame:Frame
+---@field title FontString
+---@field TitleBg Texture
+---@field InsetBg Texture
+local KamberAltFrame = CreateFrame("Frame", "KamberAltFrame", UIParent, "BasicFrameTemplateWithInset")
+
+
 --function to reset the weekly data to zero if the weekly reset has happened
 local function ResetWeeklyData()
     for characterName, charInfo in pairs(KamberAltsDB) do
@@ -36,6 +44,7 @@ local function ResetWeeklyData()
         if charInfo.vaults then
             charInfo.rewardsAvailable = charInfo.vaults > 0
             charInfo.vaults = 0
+            charInfo.vaultilvl = 0
         end
     end
 end
@@ -55,9 +64,23 @@ local function CheckForWeeklyReset()
 	end
 end
 
-function round(num, numDecimalPlaces)
+local function round(num, numDecimalPlaces)
   local mult = 10^(numDecimalPlaces or 0)
   return math.floor(num * mult + 0.5) / mult
+end
+
+local function UpdateHighestVaultItemLevel(activities)
+    local highestItemLevel = 0
+
+    for _, activity in ipairs(activities) do
+        if activity.progress >= activity.threshold then
+            if activity.level > highestItemLevel then
+                    highestItemLevel = activity.level
+            end
+        end
+    end
+
+    return highestItemLevel
 end
 
 local function UpdateGreatVaultRewards()
@@ -80,11 +103,12 @@ local function UpdateGreatVaultRewards()
     charInfo.realmName = realmName
     
     charInfo.vaults = unlockedRewards
+    charInfo.vaultilvl = UpdateHighestVaultItemLevel(activities)
 
     --check if the vault has rewards to pick up
     charInfo.rewardsAvailable = C_WeeklyRewards.HasAvailableRewards()
         
-    end
+end
 
 local function UpdateGearInfo()
     local realmName = GetRealmName()
@@ -149,6 +173,8 @@ local function UpdateCurrencyInfo()
     charInfo.currency = currency
     
 end
+
+
 
 
 -- Event handling
@@ -236,7 +262,7 @@ local yWindowSize = 400
 
     
 --Create basic display window
-local KamberAltFrame = CreateFrame("Frame", "KamberAltFrame", UIParent, "BasicFrameTemplateWithInset")
+--KamberAltFrame was defined at the top of this file
 KamberAltFrame:SetSize(xWindowSize, yWindowSize) -- Width, Height
 KamberAltFrame:SetPoint("CENTER") -- Position on the screen
 KamberAltFrame:Hide() -- Initially hidden
@@ -301,7 +327,7 @@ local function SortTable(a, b)
 	elseif KamberAltsSettings.SortMethod == "PvE iLvl" then
 		return (a.charInfo.avgItemLevel or 0) > (b.charInfo.avgItemLevel or 0)
 	elseif KamberAltsSettings.SortMethod == "Vaults" then
-		return (a.charInfo.vaults or 0) > (b.charInfo.vaults or 0)
+		return (a.charInfo.vaultilvl or 0) > (b.charInfo.vaultilvl or 0)
 	elseif KamberAltsSettings.SortMethod == GEAR_CURRENCY_NAME then
 		return (a.charInfo.currency.gear or 0) > (b.charInfo.currency.gear or 0)
 	elseif KamberAltsSettings.SortMethod == "Server" then
@@ -314,10 +340,12 @@ local function SortTable(a, b)
 end
 
 local function CreateHeaderButton(parent, text, xOffset, sortKey, xSpacing)
+--- @class CustomButton:Button
+--- @field text FontString
     local button = CreateFrame("Button", nil, parent)
     button:SetSize(xSpacing, 20)  -- Adjust the size as needed
     button:SetPoint("TOPLEFT", parent, "TOPLEFT", xOffset, 0)
-    
+
     button.text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     button.text:SetAllPoints()
     button.text:SetText(text)
@@ -432,7 +460,7 @@ function UpdateKamberAltFrame()
                 vaultText:SetTextColor(0.1, 0.9, 0.1, 1) -- R, G, B, A
                 vaultText:SetText("Yes!")
             else
-                vaultText:SetText(entry.charInfo.vaults or "0")
+                vaultText:SetText((entry.charInfo.vaults or "0") .. " | " .. (entry.charInfo.vaultilvl or "0"))
             end        
         colnum = colnum + 1
 
