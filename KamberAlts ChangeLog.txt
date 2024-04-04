@@ -1,0 +1,23 @@
+V0.0.5
+	Added Vault Rewards tracking during the weekly reset so you know which characters have rewards
+
+V0.0.4
+	Added Solo Shuffle rating and wins to the tracker
+	Change ThisWeek to sort by winning % instead of total games
+	
+V0.0.3
+	Added server name to properly track characters across multiple realms
+	Added Flightstones
+	Added Vault Rewards, added to the weekly reset wipe function as well
+	Moved initilization steps into an ADDON_LOADED event to fix some issues
+	Using LibDBIcon for minimap functions
+	Added clickable headers for table sorting
+	
+V0.0.2
+	Full tracking of ilvl, pvp rating, pvp weekly wins/games, conquest, and honor implemented
+	Basic display window with minimap button created
+	Weekly reset timer with weekly wins/games reset implemented
+	Need to add server name to the character data
+
+V0.0.1
+	Initial Development and Testing
