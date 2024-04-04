@@ -1,3 +1,9 @@
+V1.0.0
+	Vault Rewards indicators are now a different colour to pop out better
+	Alignment tweaks to the table
+	Added tooltips to each column header
+	First release
+
 V0.0.5
 	Added Vault Rewards tracking during the weekly reset so you know which characters have rewards
 

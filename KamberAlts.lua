@@ -1,5 +1,5 @@
 -- Set to current version
-local KAversion = "KamberAlts v0.0.5"
+local KAversion = "KamberAlts v1.0.0"
 local KAname = "KamberAlts"
 
 -- Set Currency IDs
@@ -8,7 +8,22 @@ local HONOR_CURRENCY_ID = 1792
 local GEAR_CURRENCY_ID = 2245 --flightstones
 local GEAR_CURRENCY_NAME = "FStones"
 
---placeholder function
+--Tooltip Texts
+local headerTooltips = {
+    ["Name"] = "The character's name\nClick to Sort by this column",
+    ["2v2"] = "Your 2v2 rating\nClick to Sort by this column",
+    ["3v3"] = "Your 3v3 rating\nClick to Sort by this column",
+    ["SS"] = "Your Solo Shuffle rating\nClick to Sort by this column",
+    ["ThisWeek"] = "Your wins and games played this week\nClick to Sort by this column",
+    ["PvP iLvl"] = "Your PvP item level\nClick to Sort by this column",
+    ["PvE iLvl"] = "Your PvE item level\nClick to Sort by this column",
+    ["Vaults"] = "Number of Vault rewards available\nYes! means you have a vault to open\nClick to Sort by this column",
+    ["Conquest"] = "Your current Conquest points\nClick to Sort by this column",
+    ["Honor"] = "Your current Honor points\nClick to Sort by this column",
+    [GEAR_CURRENCY_NAME] = "Your current Flightstones\nClick to Sort by this column",
+    ["Server"] = "The server this character is on\nClick to Sort by this column",
+}
+
 --function to reset the weekly data to zero if the weekly reset has happened
 local function ResetWeeklyData()
     for characterName, charInfo in pairs(KamberAltsDB) do
@@ -301,11 +316,12 @@ end
 local function CreateHeaderButton(parent, text, xOffset, sortKey, xSpacing)
     local button = CreateFrame("Button", nil, parent)
     button:SetSize(xSpacing, 20)  -- Adjust the size as needed
-    button:SetPoint("TOPLEFT", parent, "TOPLEFT", xOffset - 10, 0)
+    button:SetPoint("TOPLEFT", parent, "TOPLEFT", xOffset, 0)
     
     button.text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     button.text:SetAllPoints()
     button.text:SetText(text)
+    button.text:SetJustifyH("LEFT")
 
     button:SetScript("OnClick", function()
 		KamberAltsSettings.SortMethod = sortKey
@@ -313,6 +329,17 @@ local function CreateHeaderButton(parent, text, xOffset, sortKey, xSpacing)
 		UpdateKamberAltFrame()
     end)
 
+        -- Tooltip setup
+    button:SetScript("OnEnter", function()
+        GameTooltip:SetOwner(button, "ANCHOR_TOP")
+        GameTooltip:AddLine(headerTooltips[text] or "No tooltip defined for this header")
+        GameTooltip:Show()
+    end)
+
+    button:SetScript("OnLeave", function(self)
+        GameTooltip:Hide()
+    end)
+    
     return button
 end
 
@@ -402,6 +429,7 @@ function UpdateKamberAltFrame()
         local vaultText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         vaultText:SetPoint("TOPLEFT", row, "TOPLEFT", xSpacing*colnum, 0)
         if entry.charInfo.rewardsAvailable then
+                vaultText:SetTextColor(0.1, 0.9, 0.1, 1) -- R, G, B, A
                 vaultText:SetText("Yes!")
             else
                 vaultText:SetText(entry.charInfo.vaults or "0")
