@@ -17,7 +17,7 @@ local headerTooltips = {
     ["ThisWeek"] = "Your wins and games played this week\nClick to Sort by this column",
     ["PvP iLvl"] = "Your PvP item level\nClick to Sort by this column",
     ["PvE iLvl"] = "Your PvE item level\nClick to Sort by this column",
-    ["Vaults"] = "Number of Vault rewards available\nYes! means you have a vault to open\nClick to Sort by this column",
+    ["Vaults"] = "Number of Vault rewards available\nSecond value is your highest ilvl reward achieved\nYes! means you have a vault to open\nClick to Sort by this column",
     ["Conquest"] = "Your current Conquest points\nClick to Sort by this column",
     ["Honor"] = "Your current Honor points\nClick to Sort by this column",
     [GEAR_CURRENCY_NAME] = "Your current Flightstones\nClick to Sort by this column",
@@ -74,8 +74,9 @@ local function UpdateHighestVaultItemLevel(activities)
 
     for _, activity in ipairs(activities) do
         if activity.progress >= activity.threshold then
-            if activity.level > highestItemLevel then
-                    highestItemLevel = activity.level
+            local ilvl = C_Item.GetDetailedItemLevelInfo(C_WeeklyRewards.GetExampleRewardItemHyperlinks(activity.id))
+            if ilvl > highestItemLevel then
+                    highestItemLevel = ilvl
             end
         end
     end
@@ -460,7 +461,12 @@ function UpdateKamberAltFrame()
                 vaultText:SetTextColor(0.1, 0.9, 0.1, 1) -- R, G, B, A
                 vaultText:SetText("Yes!")
             else
-                vaultText:SetText((entry.charInfo.vaults or "0") .. " | " .. (entry.charInfo.vaultilvl or "0"))
+                if entry.charInfo.vaults == 0 or not entry.charInfo.vaults then
+                    vaultText:SetTextColor(0.5, 0.5, 0.5, 1) -- R, G, B, A
+                    vaultText:SetText("0")    
+                else
+                    vaultText:SetText((entry.charInfo.vaults or "0") .. " | " .. (entry.charInfo.vaultilvl or "0"))
+                end
             end        
         colnum = colnum + 1
 
