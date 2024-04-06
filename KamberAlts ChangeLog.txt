@@ -1,3 +1,6 @@
+V1.1.1
+	Fixed comparison with nil value when checking ilvl in the vault
+
 V1.1.0
 	Added Highest reward tracking to the Vaults column.  Showing the best ilvl achieved so far in the current week
 

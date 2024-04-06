@@ -1,5 +1,5 @@
 -- Set to current version
-local KAversion = "KamberAlts v1.1.0"
+local KAversion = "KamberAlts v1.1.1"
 local KAname = "KamberAlts"
 
 -- Set Currency IDs
@@ -74,7 +74,7 @@ local function UpdateHighestVaultItemLevel(activities)
 
     for _, activity in ipairs(activities) do
         if activity.progress >= activity.threshold then
-            local ilvl = C_Item.GetDetailedItemLevelInfo(C_WeeklyRewards.GetExampleRewardItemHyperlinks(activity.id))
+            local ilvl = C_Item.GetDetailedItemLevelInfo(C_WeeklyRewards.GetExampleRewardItemHyperlinks(activity.id)) or 0
             if ilvl > highestItemLevel then
                     highestItemLevel = ilvl
             end
