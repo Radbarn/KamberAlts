@@ -1,8 +1,8 @@
-## Interface: 100206
+## Interface: 110000
 ## Title: KamberAlts
 ## Author: Radbarn
 ## Notes: Tracking of ILVL / Rating / Currencies across Alt Characters
-## Version: KA1.1.1
+## Version: KA1.1.2
 ## IconTexture: Interface\AddOns\KamberAlts\KamberAlts_Icon.tga
 ## SavedVariables: KamberAltsDB, KamberAltsSettings
 

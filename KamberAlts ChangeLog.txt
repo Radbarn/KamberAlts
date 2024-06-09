@@ -1,3 +1,7 @@
+V1.1.2
+	TOC bump for TWW 11.0
+	Updated to latest LibDBIcon
+
 V1.1.1
 	Fixed comparison with nil value when checking ilvl in the vault
 

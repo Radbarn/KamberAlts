@@ -1,5 +1,5 @@
 -- Set to current version
-local KAversion = "KamberAlts v1.1.1"
+local KAversion = "KamberAlts v1.1.2"
 local KAname = "KamberAlts"
 
 -- Set Currency IDs
