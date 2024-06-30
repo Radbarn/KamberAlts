@@ -2,7 +2,7 @@
 ## Title: KamberAlts
 ## Author: Radbarn
 ## Notes: Tracking of ILVL / Rating / Currencies across Alt Characters
-## Version: KA1.1.2
+## Version: KA1.1.3
 ## IconTexture: Interface\AddOns\KamberAlts\KamberAlts_Icon.tga
 ## SavedVariables: KamberAltsDB, KamberAltsSettings
 

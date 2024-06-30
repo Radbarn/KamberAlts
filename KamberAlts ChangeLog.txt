@@ -1,5 +1,8 @@
+V1.1.3
+	Added ability to remove/delete characters from the list
+
 V1.1.2
-	TOC bump for TWW 11.0
+	TOC bump for TWW 11.0	(tested in Beta)
 	Updated to latest LibDBIcon
 
 V1.1.1

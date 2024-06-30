@@ -1,5 +1,5 @@
 -- Set to current version
-local KAversion = "KamberAlts v1.1.2"
+local KAversion = "KamberAlts v1.1.3"
 local KAname = "KamberAlts"
 
 -- Set Currency IDs
@@ -68,6 +68,34 @@ local function round(num, numDecimalPlaces)
   local mult = 10^(numDecimalPlaces or 0)
   return math.floor(num * mult + 0.5) / mult
 end
+
+-- Function to delete a character from history/saved data
+-- must be given full charactername+realmname as its parameter
+function DeleteCharacter(charName)
+    StaticPopupDialogs["CONFIRM_DELETE_CHARACTER"] = {
+        text = "Are you sure you want to delete\n" .. charName .. "?",
+        button1 = "Yes",
+        button2 = "No",
+        OnAccept = function(self)
+            local nameToDelete = charName
+            local indexToDelete = nil
+            for i, charData in pairs(KamberAltsDB) do
+                if i == nameToDelete then
+                    KamberAltsDB[i] = nil
+                    print("Character " .. nameToDelete .. " deleted from KamberAlts.")
+                    break
+                end
+            end
+            UpdateKamberAltFrame() -- Refresh the UI
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+    }
+    StaticPopup_Show("CONFIRM_DELETE_CHARACTER")
+end
+
 
 local function UpdateHighestVaultItemLevel(activities)
     local highestItemLevel = 0
@@ -258,7 +286,7 @@ end)
 --WINDOW SIZING
 -- xSpacing is the default distance between columns
 local xSpacing = 70
-local xWindowSize = 925
+local xWindowSize = 1000
 local yWindowSize = 400
 
     
@@ -388,7 +416,7 @@ function UpdateKamberAltFrame()
     end
 
 -- Column headers (both titles and sortKeys are the same)
-    local headers = {"Name", "2v2", "3v3", "SS", "ThisWeek", "PvP iLvl", "PvE iLvl", "Vaults", "Conquest", "Honor", GEAR_CURRENCY_NAME, "Server"}
+    local headers = {"Name", "2v2", "3v3", "SS", "ThisWeek", "PvP iLvl", "PvE iLvl", "Vaults", "Conquest", "Honor", GEAR_CURRENCY_NAME, "Server", ""}
 
 -- Create header
     local headerRow = CreateFrame("Frame", nil, scrollChild)
@@ -496,6 +524,17 @@ function UpdateKamberAltFrame()
         local servernameText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         servernameText:SetPoint("TOPLEFT", row, "TOPLEFT", xSpacing*colnum, 0)
         servernameText:SetText(entry.charInfo.realmName or "")
+        colnum = colnum + 1
+
+        -- Create Delete Button
+        local deleteButton = CreateFrame("Button", "DeleteButton"..i, row, "UIPanelButtonTemplate")
+        deleteButton:SetSize(20, 20)
+        deleteButton:SetText("X")
+        deleteButton:SetPoint("TOPLEFT", row, "TOPLEFT", (xSpacing*colnum) + 15, 5)
+        deleteButton:SetScript("OnClick", function()
+            DeleteCharacter(entry.charInfo.characterName .. "-" .. entry.charInfo.realmName)
+        end)
+    
         colnum = colnum + 1
         
         yOffset = yOffset - 20 -- Move down for the next row
