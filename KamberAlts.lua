@@ -1,5 +1,5 @@
 -- Set to current version
-local KAversion = "KamberAlts v1.1.3"
+local KAversion = "KamberAlts v1.2.0"
 local KAname = "KamberAlts"
 
 -- Set Currency IDs
@@ -14,6 +14,7 @@ local headerTooltips = {
     ["2v2"] = "Your 2v2 rating\nClick to Sort by this column",
     ["3v3"] = "Your 3v3 rating\nClick to Sort by this column",
     ["SS"] = "Your Solo Shuffle rating\nClick to Sort by this column",
+    ["SBG"] = "Your Solo RBG rating\nClick to Sort by this column",
     ["ThisWeek"] = "Your wins and games played this week\nClick to Sort by this column",
     ["PvP iLvl"] = "Your PvP item level\nClick to Sort by this column",
     ["PvE iLvl"] = "Your PvE item level\nClick to Sort by this column",
@@ -37,9 +38,13 @@ local function ResetWeeklyData()
     for characterName, charInfo in pairs(KamberAltsDB) do
         if charInfo.weeklyPlayed2v2 then charInfo.weeklyPlayed2v2 = 0 end
         if charInfo.weeklyPlayed3v3 then charInfo.weeklyPlayed3v3 = 0 end
+        if charInfo.weeklyPlayedSS then charInfo.weeklyPlayedSS = 0 end
+        if charInfo.weeklyPlayedSBG then charInfo.weeklyPlayedSBG = 0 end
         if charInfo.weeklyPlayed then charInfo.weeklyPlayed = 0 end
         if charInfo.weeklyWon2v2 then charInfo.weeklyWon2v2 = 0 end
         if charInfo.weeklyWon3v3 then charInfo.weeklyWon3v3 = 0 end
+        if charInfo.weeklyWonSS then charInfo.weeklyWonSS = 0 end
+        if charInfo.weeklyWonSBG then charInfo.weeklyWonSBG = 0 end
         if charInfo.weeklyWon then charInfo.weeklyWon = 0 end
         if charInfo.vaults then
             charInfo.rewardsAvailable = charInfo.vaults > 0
@@ -160,9 +165,10 @@ local function UpdatePvPInfo()
     local realmName = GetRealmName()
     local playerName = UnitName("player")
     local characterName = playerName .. "-" .. realmName
-    local rating2v2, seasonBest2v2, weeklyBest2v2, seasonPlayed2v2, SeasonWon2v2, weeklyPlayed2v2, weeklyWon2v2, cap2v2 = GetPersonalRatedInfo(1) -- 2v2 bracket index is 1
-    local rating3v3, seasonBest3v3, weeklyBest3v3, seasonPlayed3v3, SeasonWon3v3, weeklyPlayed3v3, weeklyWon3v3, cap3v3 = GetPersonalRatedInfo(2) -- 3v3 bracket index is 2
-    local ratingSS, seasonBestSS, weeklyBestSS, seasonPlayedSS, SeasonWonSS, weeklyPlayedSS, weeklyWonSS, capSS = GetPersonalRatedInfo(7) -- solo queue bracket index is 7
+    local rating2v2, seasonBest2v2, weeklyBest2v2, seasonPlayed2v2, seasonWon2v2, weeklyPlayed2v2, weeklyWon2v2, lastWeeksBest2v2, hasWon2v2, pvpTier2v2, ranking2v2, roundsSeasonPlayed2v2, roundsSeasonWon2v2, roundsWeeklyPlayed2v2, roundsWeeklyWon2v2 = GetPersonalRatedInfo(1) -- 2v2 bracket index is 1
+    local rating3v3, seasonBest3v3, weeklyBest3v3, seasonPlayed3v3, seasonWon3v3, weeklyPlayed3v3, weeklyWon3v3, lastWeeksBest3v3, hasWon3v3, pvpTier3v3, ranking3v3, roundsSeasonPlayed3v3, roundsSeasonWon3v3, roundsWeeklyPlayed3v3, roundsWeeklyWon3v3 = GetPersonalRatedInfo(2) -- 3v3 bracket index is 2
+    local ratingSS, seasonBestSS, weeklyBestSS, seasonPlayedSS, seasonWonSS, weeklyPlayedSS, weeklyWonSS, lastWeeksBestSS, hasWonSS, pvpTierSS, rankingSS, roundsSeasonPlayedSS, roundsSeasonWonSS, roundsWeeklyPlayedSS, roundsWeeklyWonSS = GetPersonalRatedInfo(7) -- solo arena bracket index is 7
+    local ratingSBG, seasonBestSBG, weeklyBestSBG, seasonPlayedSBG, seasonWonSBG, weeklyPlayedSBG, weeklyWonSBG, lastWeeksBestSBG, hasWonSBG, pvpTierSBG, rankingSBG, roundsSeasonPlayedSBG, roundsSeasonWonSBG, roundsWeeklyPlayedSBG, roundsWeeklyWonSBG = GetPersonalRatedInfo(9) -- solo RBG bracket index is 9
     
     KamberAltsDB[characterName] = KamberAltsDB[characterName] or {}
     local charInfo = KamberAltsDB[characterName]
@@ -173,14 +179,17 @@ local function UpdatePvPInfo()
 	charInfo.rating2v2 = rating2v2
 	charInfo.rating3v3 = rating3v3
 	charInfo.ratingSS = ratingSS
+    charInfo.ratingSBG = ratingSBG
 	charInfo.weeklyPlayed2v2 = weeklyPlayed2v2
 	charInfo.weeklyPlayed3v3 = weeklyPlayed3v3
 	charInfo.weeklyPlayedSS = weeklyPlayedSS
-	charInfo.weeklyPlayed = weeklyPlayed2v2 + weeklyPlayed3v3 + weeklyPlayedSS
+    charInfo.weeklyPlayedSBG = weeklyPlayedSBG
+	charInfo.weeklyPlayed = weeklyPlayed2v2 + weeklyPlayed3v3 + weeklyPlayedSS + weeklyPlayedSBG
 	charInfo.weeklyWon2v2 = weeklyWon2v2
 	charInfo.weeklyWon3v3 = weeklyWon3v3
 	charInfo.weeklyWonSS = weeklyWonSS
-	charInfo.weeklyWon = weeklyWon2v2 + weeklyWon3v3 + weeklyWonSS
+    charInfo.weeklyWonSBG = weeklyWonSBG
+	charInfo.weeklyWon = weeklyWon2v2 + weeklyWon3v3 + weeklyWonSS + weeklyWonSBG
 end
 
 local function UpdateCurrencyInfo()
@@ -334,6 +343,8 @@ local function SortTable(a, b)
 		return (a.charInfo.rating3v3 or 0) > (b.charInfo.rating3v3 or 0)
 	elseif KamberAltsSettings.SortMethod == "SS" then                      -- sort by rating
 		return (a.charInfo.ratingSS or 0) > (b.charInfo.ratingSS or 0)
+	elseif KamberAltsSettings.SortMethod == "SBG" then                      -- sort by rating
+		return (a.charInfo.ratingSBG or 0) > (b.charInfo.ratingSBG or 0)
 	elseif KamberAltsSettings.SortMethod == "ThisWeek" then             -- sort by win %
 		local x, y
         if (a.charInfo.weeklyPlayed or 0) == 0 then
@@ -389,7 +400,7 @@ local function CreateHeaderButton(parent, text, xOffset, sortKey, xSpacing)
         -- Tooltip setup
     button:SetScript("OnEnter", function()
         GameTooltip:SetOwner(button, "ANCHOR_TOP")
-        GameTooltip:AddLine(headerTooltips[text] or "No tooltip defined for this header")
+        GameTooltip:AddLine(headerTooltips[text] or "")
         GameTooltip:Show()
     end)
 
@@ -416,7 +427,7 @@ function UpdateKamberAltFrame()
     end
 
 -- Column headers (both titles and sortKeys are the same)
-    local headers = {"Name", "2v2", "3v3", "SS", "ThisWeek", "PvP iLvl", "PvE iLvl", "Vaults", "Conquest", "Honor", GEAR_CURRENCY_NAME, "Server", ""}
+    local headers = {"Name", "2v2", "3v3", "SS", "SBG", "ThisWeek", "PvP iLvl", "PvE iLvl", "Vaults", "Conquest", "Honor", GEAR_CURRENCY_NAME, "Server", ""}
 
 -- Create header
     local headerRow = CreateFrame("Frame", nil, scrollChild)
@@ -462,6 +473,12 @@ function UpdateKamberAltFrame()
         ratingSSText:SetText(entry.charInfo.ratingSS or "0")
         colnum = colnum + 1
 
+        -- SBG Rating
+        local ratingSBGText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        ratingSBGText:SetPoint("TOPLEFT", row, "TOPLEFT", xSpacing*colnum, 0)
+        ratingSBGText:SetText(entry.charInfo.ratingSBG or "0")
+        colnum = colnum + 1
+        
         -- Games This Week
         local gtwText = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         local gtwGames = (entry.charInfo.weeklyPlayed or 0)
@@ -526,14 +543,24 @@ function UpdateKamberAltFrame()
         servernameText:SetText(entry.charInfo.realmName or "")
         colnum = colnum + 1
 
-        -- Create Delete Button
+        -- Delete Button
         local deleteButton = CreateFrame("Button", "DeleteButton"..i, row, "UIPanelButtonTemplate")
         deleteButton:SetSize(20, 20)
         deleteButton:SetText("X")
-        deleteButton:SetPoint("TOPLEFT", row, "TOPLEFT", (xSpacing*colnum) + 15, 5)
+        deleteButton:SetPoint("TOPLEFT", row, "TOPLEFT", (xSpacing*colnum) + 30, 5)
         deleteButton:SetScript("OnClick", function()
             DeleteCharacter(entry.charInfo.characterName .. "-" .. entry.charInfo.realmName)
         end)
+            -- Tooltip setup
+            deleteButton:SetScript("OnEnter", function()
+                GameTooltip:SetOwner(deleteButton, "ANCHOR_TOP")
+                GameTooltip:AddLine("Click to forget " .. entry.charInfo.characterName or "")
+                GameTooltip:Show()
+            end)
+            deleteButton:SetScript("OnLeave", function(self)
+                GameTooltip:Hide()
+            end)
+
     
         colnum = colnum + 1
         
