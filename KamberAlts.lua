@@ -21,7 +21,7 @@ local headerTooltips = {
     ["Vaults"] = "Number of Vault rewards available\nSecond value is your highest ilvl reward achieved\nYes! means you have a vault to open\nClick to Sort by this column",
     ["Conquest"] = "Your current Conquest points\nClick to Sort by this column",
     ["Honor"] = "Your current Honor points\nClick to Sort by this column",
-    [GEAR_CURRENCY_NAME] = "Your current Flightstones\nClick to Sort by this column",
+    [GEAR_CURRENCY_NAME] = "Your current Valorstones\nClick to Sort by this column",
     ["Server"] = "The server this character is on\nClick to Sort by this column",
 }
 
