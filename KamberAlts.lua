@@ -1,12 +1,12 @@
 -- Set to current version
-local KAversion = "KamberAlts v1.2.0"
+local KAversion = "KamberAlts v1.2.1"
 local KAname = "KamberAlts"
 
 -- Set Currency IDs
 local CONQUEST_CURRENCY_ID = 1602
 local HONOR_CURRENCY_ID = 1792
-local GEAR_CURRENCY_ID = 2245 --flightstones
-local GEAR_CURRENCY_NAME = "FStones"
+local GEAR_CURRENCY_ID = 3008 --valorstones
+local GEAR_CURRENCY_NAME = "VStones"
 
 --Tooltip Texts
 local headerTooltips = {
