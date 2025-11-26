@@ -20,3 +20,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: release/*.zip
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
