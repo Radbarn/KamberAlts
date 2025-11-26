@@ -1,3 +1,6 @@
+V1.2.2
+	TOC update for 11.2.5
+	
 V1.2.1
 	Changed DF's Flightstones tracking over to TWW's Valorstones
 	Updated to latest LibDBIcon (v11.0.0)
